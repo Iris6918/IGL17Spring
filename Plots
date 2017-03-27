@@ -1,0 +1,77 @@
+import csv
+import pandas as pd
+import numpy as np
+import sys
+import time
+import pickle
+#sig_dis = pickle.load(open('Signature_Distribution.p','rb'),encoding = 'latin1')
+#sig_links = list(sig_dist.keys())
+from matplotlib import cm
+from matplotlib import colors
+import pandas as pd
+df = pd.read_table('W_trips.txt',delimiter=' ', header=None )
+
+
+import numpy as np
+import operator
+#ratio = []
+# Pearson Corrlation Coefficient
+dict = {}
+for i in range(50):
+    if i == 49:
+        break
+    for j in range(i+1,50):
+        #ratio.append(df[i]/df[j])
+        t = (i+1,j+1)
+        dict[t] = stats.pearsonr(df[i], df[j])
+        #np.std(df[i]/df[j])
+sorted_d = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
+#print (sorted_d)
+#plt.figure()
+#plt.title("plot")
+#    plt.plot()
+plt.figure(figsize=(10,6))
+sig32 = df[32]
+for i in range(7):
+    temp = sig32[24*i:24*(i+1)]
+    time = np.arange(0,24)
+    plt.plot(time,temp,label=str(i))
+#temp = sig32[0:24]
+#time = np.arange(0,24)
+plt.legend(loc=0)
+plt.show()
+
+# plot sig 35 
+plt.figure(figsize=(10,6))
+sig35 = df[35]
+for i in range(7):
+    temp = sig35[24*i:24*(i+1)]
+    time = np.arange(0,24)
+    plt.plot(time,temp,label=str(i))
+#temp = sig32[0:24]
+#time = np.arange(0,24)
+plt.legend(loc=0)
+plt.show()
+
+# 
+def pic(sig,week):
+    plt.figure(figsize=(10,6))
+    for i in range(7):
+        temp = sig[(week-1)*168+24*i:(week-1)*168+24*(i+1)]
+        time = np.arange(0,24)
+        plt.title(week)
+        plt.plot(time,temp,label=str(i))
+    plt.legend(loc=0)
+    plt.show()
+pic(df[28],40),pic(df[42],40)
+# find one pattern in one selected days for whole year
+def day_pic(sig):
+    plt.figure(figsize=(10,6))
+    for i in range(52):
+        temp = sig[24+i*168:48+i*168]
+        time = np.arange(0,24)
+        plt.title('plot')
+        plt.plot(time,temp,'g')
+    plt.show()
+
+day_pic(df[28]),day_pic(df[42])  
