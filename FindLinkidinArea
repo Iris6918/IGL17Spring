@@ -1,0 +1,72 @@
+import numpy
+import csv
+import pandas as pd
+df = pd.read_table('links.csv',delimiter=',')
+#print(df.head())
+df_node = pd.read_table('nodes.csv',delimiter=',')
+import folium
+# create the map
+map1 = folium.Map(location=[40.758532, -73.9888431],tiles='Stamen Toner', zoom_start=11)
+
+import numpy as np
+def find_linkID(x1,x2,y1,y2):
+    df1 = df.loc[(df['startX'] >x1) & (df['endX'] < x2), :]
+    df2 = df.loc[(df['startY'] >y1) & (df['endY'] < y2), :]
+    '''df1_temp = df1[['link_id','startX','startY','endX','endY']]
+    df2_temp  =df2[['link_id','startX','startY','endX','endY']]'''
+    
+    s1 = pd.merge(df1, df2, on='link_id', how='inner')
+    return s1
+# minimize the range 
+new_df = find_linkID(-74.02,-73.91,40.70,40.88)
+
+new_df = new_df[['link_id','startX_x','startY_x','endX_x','endY_x']]
+len(new_df)
+new_df.head()
+new_df[22:24]
+#set the boundary
+df3 = new_df.loc[(new_df['startY_x'] <= 40.744180) &  (new_df['startX_x'] >= -73.958970), :]
+#df4 =new_df.loc[(new_df['endY_x'] < -73.958970)]
+#s2 = pd.merge(df3, df4, on='link_id', how='inner')
+f_df = new_df[~new_df.link_id.isin(df3.link_id)]
+
+df4 = new_df.loc[(new_df['startY_x'] >= 40.851532) &  (new_df['startX_x'] < -73.952287), :]
+df5 = new_df.loc[(new_df['startY_x'] >=40.799377) &  (new_df['startX_x'] < -73.983786), :]
+df6 = new_df.loc[(new_df['startY_x'] >=40.762767) &  (new_df['startX_x'] < -74.008895), :]
+f_df = f_df[~f_df.link_id.isin(df4.link_id)]
+f_df = f_df[~f_df.link_id.isin(df5.link_id)]
+f_df = f_df[~f_df.link_id.isin(df6.link_id)]
+
+#temp1 = df.loc[(df['startX'][i] >40.707614) & (df['endX'] < x2), :]   
+df7 = pd.merge(temp1, temp2, on='link_id', how='inner')
+f_df = f_df[~f_df.link_id.isin(df6.link_id)]
+
+start_points = f_df[['startY_x','startX_x']].as_matrix()
+end_points = f_df[['endY_x','endX_x']].as_matrix()
+linkid = f_df['link_id'].astype(str).as_matrix()
+
+map_osm = folium.Map(location=[40.790278, -73.959722], zoom_start=12)
+for i in range(len(linkid)):
+    p = folium.PolyLine(locations=[start_points[i],end_points[i]], popup=linkid[i],
+                         latlon=True)
+    map_osm.add_children(p)
+map_osm.save('new_map.html')
+
+#find all link id in a selected area
+def area_linkid(x1,x2,y1,y2):
+    linkid = []
+    df1 = df.loc[(df['startX'] >x1) & (df['endX'] < x2), :]
+    df2 = df.loc[(df['startY'] >y1) & (df['endY'] < y2), :]
+    '''df1_temp = df1[['link_id','startX','startY','endX','endY']]
+    df2_temp  =df2[['link_id','startX','startY','endX','endY']]'''
+    
+    s1 = pd.merge(df1, df2, on='link_id', how='inner')
+    return s1
+temp = area_linkid( -74.004604,-73.975537,40.737593,40.754935)
+
+temp = temp[['link_id','startX_x','startY_x','endX_x','endY_x']]
+start_points_temp = temp[['startY_x','startX_x']].as_matrix()
+end_points_temp = temp[['endY_x','endX_x']].as_matrix()
+linkid_temp = temp['link_id'].astype(str).as_matrix()
+linkid_temp = temp['link_id'].as_matrix()
+linkid_temp
