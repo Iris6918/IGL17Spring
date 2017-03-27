@@ -1,39 +1,48 @@
-import pandas as pd
-df = pd.read_table('W_trips.txt',delimiter=' ', header=None )
-import pandas as pd
-from scipy import stats
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.pyplot as plt
-#content = pd.read_table('W_trips.txt',delimiter=' ', header=None )
+import pandas as pd
+#read file
+data=pd.read_csv('targets_travel_times.csv', sep=',',header=None)
+data = data.values
+df = pd.read_csv('links.csv')
+#This is the 12 linkids
+t =[128255,169017,182993,181188,121161,120676,182544,167734,148462,204266,167761,203126]
 
-import numpy as np
-import operator
-#ratio = []
-# Pearson Corrlation Coefficient
-dict = {}
-for i in range(50):
-    if i == 49:
-        break
-    for j in range(i+1,50):
-        #ratio.append(df[i]/df[j])
-        t = (i+1,j+1)
-        dict[t] = stats.pearsonr(df[i], df[j])
-        #np.std(df[i]/df[j])
-sorted_d = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
-#print (sorted_d)
-#plt.figure()
-#plt.title("plot")
-#    plt.plot()
-plt.figure(figsize=(10,6))
-sig32 = df[32]
-for i in range(7):
-    temp = sig32[24*i:24*(i+1)]
-    time = np.arange(0,24)
-    plt.plot(time,temp,label=str(i))
-#temp = sig32[0:24]
-#time = np.arange(0,24)
-plt.legend(loc=0)
-plt.show()
+result = pd.DataFrame([])
+for i in range(0, len(t)):
+    result = result.append(df.iloc[[t[i]-1]])
+#result is the matrix of the travel_times
+result = result.values
+#nodes is the matrix: nodes[:,0] is the linkid. nodes[:,1] and nodes[:,2] are two nodeids(startpoint and endpoint)
+nodes = np.zeros((12,3))
+for i in range(3):
+    nodes[:,i] = result[:,i]#time is a column index of travel time
+from dijkstar import Graph, find_path
+def shortest_path_for_one_hour(time):
+    graph = Graph()
+    for i in range(12):
+        if not (data[i][time].isspace()):
+            #match link_id and node_ids
+            graph.add_edge(nodes[i][1],nodes[i][2] , {'cost': float(data[i][time])})
+    cost_func = lambda u, v, e, prev_e: e['cost']
+    ssp = {}
+    #startpoint and endpoint
+    start = nodes[:,1]
+    target = nodes[:,2]
+   
+    for i in start:
+        for j in target:
+            if i != j:
+                #t is a tuple of startpoint and endpoint. t:(startpoint,endpoint). note that startpoint != endpoint
+                t = (i,j)
+                try:
+                    #run dijkstar and save the path in a dictionary
+                    #Format: Key: t(tuple). Value: {nodeids in shortest path, every cost of the edge, total cost}
+                    ssp[t] = find_path(graph, i, j, cost_func=cost_func)
+                except:
+                    #if there is no path, write no paht between startpoint and endpoint
+                    ssp[t] = "No path between " + str(i) + " and " + str(j)
+                
+    for k in ssp.keys():
+        print (str(k) + " " + str(ssp[k]))
+        
+  
