@@ -1,0 +1,39 @@
+import pandas as pd
+df = pd.read_table('W_trips.txt',delimiter=' ', header=None )
+import pandas as pd
+from scipy import stats
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+#content = pd.read_table('W_trips.txt',delimiter=' ', header=None )
+
+import numpy as np
+import operator
+#ratio = []
+# Pearson Corrlation Coefficient
+dict = {}
+for i in range(50):
+    if i == 49:
+        break
+    for j in range(i+1,50):
+        #ratio.append(df[i]/df[j])
+        t = (i+1,j+1)
+        dict[t] = stats.pearsonr(df[i], df[j])
+        #np.std(df[i]/df[j])
+sorted_d = sorted(dict.items(), key=operator.itemgetter(1), reverse=True)
+#print (sorted_d)
+#plt.figure()
+#plt.title("plot")
+#    plt.plot()
+plt.figure(figsize=(10,6))
+sig32 = df[32]
+for i in range(7):
+    temp = sig32[24*i:24*(i+1)]
+    time = np.arange(0,24)
+    plt.plot(time,temp,label=str(i))
+#temp = sig32[0:24]
+#time = np.arange(0,24)
+plt.legend(loc=0)
+plt.show()
